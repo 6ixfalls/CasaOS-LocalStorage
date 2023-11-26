@@ -806,6 +806,7 @@ func IsDiskSupported(d model.LSBLKModel) bool {
 		strings.Contains(d.SubSystems, "block:scsi:vmbus:acpi") || // Microsoft Hyper-V
 		strings.Contains(d.SubSystems, "block:mmc:mmc_host:pci") ||
 		strings.Contains(d.SubSystems, "block:scsi:pci") ||
+		strings.Contains(d.SubSystems, "block:xen") ||
 		(d.Tran == "ata" && d.Type == "disk") || d.Tran == "usb"
 }
 func IsFormatSupported(d model.LSBLKModel) bool {
