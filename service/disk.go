@@ -350,20 +350,20 @@ func (d *diskService) LSBLK(isUseCache bool) []model.LSBLKModel {
 		var blkChildren []model.LSBLKModel
 		smart := MyService.Disk().SmartCTL(blk.Path)
 		for _, child := range blk.Children {
-			if child.RM {
-				key := child.Path
-				if _, exists := knownChildren[key]; !exists {
-					if child.Type == "lvm" {
-						knownChildren[key] = true
-					}
+			key := child.Path
+			if _, exists := knownChildren[key]; !exists {
+				if child.Type == "lvm" {
+					knownChildren[key] = true
+				}
+				if child.RM {
 					// if strings.ToLower(strings.TrimSpace(child.State)) != "ok" {
 					// 	health = false
 					// }
 					f, _ := strconv.ParseUint(child.FSUsed.String(), 10, 64)
 					fsused += f
 				}
+				blkChildren = append(blkChildren, child)
 			}
-			blkChildren = append(blkChildren, child)
 		}
 		if smart.SmartStatus.Passed {
 			blk.Health = "OK"
