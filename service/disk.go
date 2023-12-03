@@ -337,6 +337,7 @@ func (d *diskService) LSBLK(isUseCache bool) []model.LSBLKModel {
 	var fsused uint64
 
 	result := make([]model.LSBLKModel, 0)
+	knownChildren := make(map[string]bool)
 
 	for _, blk := range blkList {
 
@@ -350,12 +351,17 @@ func (d *diskService) LSBLK(isUseCache bool) []model.LSBLKModel {
 		smart := MyService.Disk().SmartCTL(blk.Path)
 		for _, child := range blk.Children {
 			if child.RM {
-
-				// if strings.ToLower(strings.TrimSpace(child.State)) != "ok" {
-				// 	health = false
-				// }
-				f, _ := strconv.ParseUint(child.FSUsed.String(), 10, 64)
-				fsused += f
+				key := child.Path
+				if _, exists := knownChildren[key]; !exists {
+					if child.Type == "lvm" {
+						knownChildren[key] = true
+					}
+					// if strings.ToLower(strings.TrimSpace(child.State)) != "ok" {
+					// 	health = false
+					// }
+					f, _ := strconv.ParseUint(child.FSUsed.String(), 10, 64)
+					fsused += f
+				}
 			}
 			blkChildren = append(blkChildren, child)
 		}
